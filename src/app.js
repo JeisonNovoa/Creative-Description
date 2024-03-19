@@ -4,7 +4,9 @@ const descriptionRoutes = require("./routes/descriptionRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
-app.use(express.text());
+
+// Configuración para analizar solicitudes con formato JSON y URL codificadas
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/creativeDescription", descriptionRoutes);
