@@ -2,39 +2,30 @@ const { analyzeWithOpenAI } = require("../services/openaiService");
 
 exports.generateProductDescription = async (req, res, next) => {
   try {
-    const productDescriptionHTML = req.body;
+    const { productName, productDescription } = req.body;
 
-    let prompt = `Descripción del Producto: ${productDescriptionHTML}
+    let prompt = `Nombre del producto: ${productName}\n 
+    Descripción del Producto: ${productDescription}
 
-    Basado en la descripción proporcionada, realiza lo siguiente:
-    
-    1. Identifica y describe el tipo de producto.
-    2. Determina las posibles necesidades y deseos del cliente ideal para este tipo de producto.
-    3. Selecciona el estilo de escritura más adecuado (informal, técnico, persuasivo) para este producto y público objetivo.
-    4. Proporciona instrucciones específicas sobre cómo debería ser la descripción para maximizar el atractivo del producto, incluyendo aspectos clave a destacar.
-    
-    Genera una descripción creativa y única del producto que cumpla con los siguientes criterios:
-    
-    - Sea altamente relevante y detallada para el tipo de producto identificado.
-    - Hable directamente a las necesidades y deseos del cliente ideal.
-    - Utilice el estilo de escritura seleccionado para enganchar al público objetivo.
-    - Destaque entre la competencia, enfocándose en características únicas o ventajas del producto.
-    
-    La descripción generada debe ser adecuada para su uso directo en un ecommerce, proporcionando a los clientes toda la información necesaria para tomar una decisión de compra informada. Todo esto debe ser devuelto en formato HTML, siguiendo la estructura y clases proporcionadas. Puedes modificar, agregar o quitar elementos de la lista ('li') según sea necesario para mejorar la descripción, pero asegúrate de no introducir nuevos elementos o clases que no estén presentes en la estructura original tampoco cambies los datos de la imagen.`;
+    Actúa como el mejor mejorador de descripciones de productos para un ecommerce. 
+    Imagina que tienes que mejorar la descripción de un producto basándote en el nombre y la 
+    descripción inicial proporcionada. Tu objetivo es enriquecer la descripción existente, 
+    haciéndola más atractiva y persuasiva para los clientes potenciales. 
+    Considera añadir detalles relevantes, destacar beneficios clave, 
+    utilizar un lenguaje convincente y asegurarte de que la descripción sea clara y concisa. 
+    También, ten en cuenta el público objetivo y el contexto del producto. Por ejemplo, 
+    si el producto es una aspiradora, podrías resaltar su potencia de succión, 
+    su diseño ergonómico para facilitar la limpieza y cómo puede mejorar la calidad 
+    del aire en el hogar. Antes de darme la respuesta, hazme cualquier pregunta para que 
+    puedas darme la mejor respuesta posible. Importante responder con la descripcion mejorada con lo que tepase como descripcion
+    si tienes que inventar algo que no se especificó hazlo, incluyendo el publico objetivo entre otros aspectos,
+    recuerda que el precio no se especifica en la descripcion, ya que eso lo especifico en otro lado.Todo esto debe ser devuelto en un campo de texto sin ningún formato adicional.`;
 
     const response = await analyzeWithOpenAI(prompt);
 
     if (response && response.choices && response.choices.length > 0) {
-      const enhancedDescriptionHTML = response.choices[0].message.content;
-      const startIndex = enhancedDescriptionHTML.indexOf(
-        '<div className="description">'
-      );
-      const endIndex = enhancedDescriptionHTML.lastIndexOf("</div>");
-      const cleanedHTML = enhancedDescriptionHTML.substring(
-        startIndex,
-        endIndex
-      );
-      res.status(200).header("Content-Type", "text/html").send(cleanedHTML);
+      const enhancedDescription = response.choices[0].message.content;
+      res.status(200).json({ description: enhancedDescription });
     } else {
       console.error("Unexpected response from OpenAI API:", response);
       res.status(500).json({
